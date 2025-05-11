@@ -104,7 +104,7 @@ def main() :
        summary['total_employees'] += 1
        summary['total_hours'] += hours_list[i]
        summary['total_grosspay'] += GrossPay
-       summary['total_incometax'] += incomeTax
+       summary['total_incomeTax'] += incomeTax
        summary['total_netpay'] += netPay
     display_totals(summary)
     GoodbyeMessage()
