@@ -65,9 +65,9 @@ def display_totals(summary) :
     print("\n=== Payroll Summary ===")
     print(f"{'Total Employees:':<20}{summary['total_employees']}")
     print(f"{'Total Hours:':<20}{summary['total_hours']}")
-    print(f"{'Total Gross Pay:':<20}${summary['total_GrossPay']}")
+    print(f"{'Total Gross Pay:':<20}${summary['total_grosspay']}")
     print(f"{'Total Income Tax:':<20}${summary['total_incomeTax']}")
-    print(f"{'Total Net Pay:':<20}${summary['total_netPay']}")
+    print(f"{'Total Net Pay:':<20}${summary['total_netpay']}")
 def main() :
     WelcomeMessage()
     from_dates = []
@@ -92,20 +92,20 @@ def main() :
        rates.append(rate)
        taxes.append(taxRate)
     summary = {
-        'total_employees': 0,
+        'total_employees' : 0,
         'total_hours': 0,
         'total_grosspay' : 0,
-        'total_incometax': 0,
+        'total_incomeTax': 0,
         'total_netpay': 0
     }
     for i in range(len(names)):
        GrossPay, incomeTax, netPay = CalculatePay(hours_list[i],rates[i],taxes[i])
-       displayEmployeeInfo(from_dates[i],to_dates[i],names[i],hours_list[i],rates[i],GrossPay, taxRate[i],incomeTax,netPay)
+       displayEmployeeInfo(from_dates[i],to_dates[i],names[i],hours_list[i],rates[i],GrossPay, taxes[i],incomeTax,netPay)
        summary['total_employees'] += 1
        summary['total_hours'] += hours_list[i]
-       summary['total_grossPay'] += GrossPay
+       summary['total_grosspay'] += GrossPay
        summary['total_incometax'] += incomeTax
-       summary['total_netPay'] += netPay
+       summary['total_netpay'] += netPay
     display_totals(summary)
     GoodbyeMessage()
 if __name__=="__main__":
