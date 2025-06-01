@@ -1,10 +1,12 @@
 #Stephanie Monk 
 #CIS261
 #Course Project 
-#Phase 2
+#Phase 3
 
 
-
+import datetime
+import os 
+FILENAME = "employee_data.txt"
 def WelcomeMessage () : 
     print("\n Welcome to the Employee Payroll System")
 def GoodbyeMessage (): 
@@ -41,9 +43,11 @@ def GetDateRange() :
     while True:
         from_date = input("Enter FROM date (mm/dd/yyyy): ").strip()
         to_date = input("Enter TO date (mm/dd/yyyy): ").strip()
-        if from_date and to_date:
-            return from_date, to_date
-        else:
+        try: 
+           datetime.datetime.strptime(from_date, "%m/%d/%Y")
+           datetime.datetime.strptime(to_date, "%m/%d/%Y")
+           return from_date, to_date 
+        except ValueError:
             print("Both dates must be entered in mm/dd/yyyy format.")
 def CalculatePay(totalHours, hourlyRate,taxRate):
     GrossPay = totalHours * hourlyRate
@@ -68,49 +72,54 @@ def display_totals(summary) :
     print(f"{'Total Gross Pay:':<20}${summary['total_grosspay']}")
     print(f"{'Total Income Tax:':<20}${summary['total_incomeTax']}")
     print(f"{'Total Net Pay:':<20}${summary['total_netpay']}")
+def ReadAndDisplayFile():
+    if not os.path.exists(FILENAME):
+        print("Data file not found.")
+        return 
+    choice = input("\nEnter FROM date for report(mm/dd/yyyy) or 'All' to display all records: ").strip()
+    try: 
+        if choice.lower() != "all":
+            datetime.datetime.strptime(choice, "%m/%d/%Y")
+    except ValueError:
+        print("Invalid date format. Use mm/dd/yyyy.")
+        return
+    summary = {
+        'total_employees':0,
+        'total_hours':0,
+        'total_grosspay':0,
+        'total_incomeTax':0,
+        'total_netpay':0,
+    }
+    with open(FILENAME,"r") as file: 
+            for line in file: 
+                from_date, to_date, name, hours,rate,taxRate = line.strip().split("|")
+                if choice.lower() != "all" and from_date != choice:
+                    continue
+                hours = float(hours)
+                rate = float(rate)
+                taxRate = float(taxRate)
+                GrossPay,incomeTax,netPay = CalculatePay(hours,rate,taxRate)
+                displayEmployeeInfo(from_date, to_date,name,hours,rate,GrossPay,taxRate,incomeTax,netPay)
+                summary['total_employees']+= 1
+                summary['total_hours'] += hours 
+                summary['total_grosspay'] += GrossPay
+                summary['total_incomeTax'] += incomeTax
+                summary['total_netpay'] += netPay
+    display_totals(summary)
 def main() :
     WelcomeMessage()
-    from_dates = []
-    to_dates = []
-    names =[]
-    hours_list = []
-    rates = []
-    taxes = []    
-    while True: 
-       print("Type 'End' to stop or enter employee name to continue: ")
-       name = GetEmployeeName()
-       if name.lower() == "end":
-           break 
-       from_date, to_date = GetDateRange()
-       hours = GetTotalhours()
-       rate = GetHourlyRate()
-       taxRate = GetTaxRate()
-       from_dates.append(from_date)
-       to_dates.append(to_date)
-       names.append(name)
-       hours_list.append(hours)
-       rates.append(rate)
-       taxes.append(taxRate)
-    summary = {
-        'total_employees' : 0,
-        'total_hours': 0,
-        'total_grosspay' : 0,
-        'total_incomeTax': 0,
-        'total_netpay': 0
-    }
-    for i in range(len(names)):
-       GrossPay, incomeTax, netPay = CalculatePay(hours_list[i],rates[i],taxes[i])
-       displayEmployeeInfo(from_dates[i],to_dates[i],names[i],hours_list[i],rates[i],GrossPay, taxes[i],incomeTax,netPay)
-       summary['total_employees'] += 1
-       summary['total_hours'] += hours_list[i]
-       summary['total_grosspay'] += GrossPay
-       summary['total_incomeTax'] += incomeTax
-       summary['total_netpay'] += netPay
-    display_totals(summary)
+    with open (FILENAME, "a") as file:
+        while True:
+            print("Type 'End' to stop or enter employee name to continue: ")
+            name = GetEmployeeName()
+            if name.lower() =="end":
+                break 
+            from_date,to_date = GetDateRange()
+            hours = GetTotalhours()
+            rate = GetHourlyRate()
+            taxRate = GetTaxRate()
+            file.write(f"{from_date}|{to_date}|{name}|{hours}|{rate}|{taxRate}\n")
+    ReadAndDisplayFile()
     GoodbyeMessage()
 if __name__=="__main__":
     main()
-    
-
-    
-
